@@ -67,10 +67,5 @@ namespace Test_Application
         {
             mediaUriElement.SetToAuto();
         }
-
-        private void Switch_OnClick(object sender, RoutedEventArgs e)
-        {
-            mediaUriElement.VideoCaptureDevice = MultimediaUtil.VideoInputDevices[1];
-        }
     }
 }

@@ -20,7 +20,6 @@
             <Button x:Name="addFocus" Click="AddFocus_OnClick" Content="+focus" Padding="4" Margin="4"></Button>
             <Button x:Name="minusFocus" Click="MinusFocus_OnClick" Content="-focus" Padding="4" Margin="4"></Button>
             <Button x:Name="toDefault" Click="ToDefault_OnClick" Content="auto" Padding="4" Margin="4"></Button>
-            <Button x:Name="switch" Click="Switch_OnClick" Content="switch" Padding="4" Margin="4"></Button>
         </StackPanel>
         <controls:VideoCaptureElement x:Name="mediaUriElement" Grid.Row="1" Margin="4"></controls:VideoCaptureElement>
     </Grid>
