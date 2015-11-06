@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -14,7 +15,7 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
     /// <summary>
     /// A Player that plays video from a video capture device.
     /// </summary>
-    public class VideoCapturePlayer : MediaPlayerBase, ISampleGrabberCB
+    public class VideoCapturePlayer : MediaPlayerBase, ISampleGrabberCB,ICameraController
     {
         [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
         private static extern void CopyMemory(IntPtr destination, IntPtr source, [MarshalAs(UnmanagedType.U4)] int length);
@@ -76,6 +77,11 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
         private ISampleGrabber m_sampleGrabber;
 
         private string m_fileName;
+
+        /// <summary>
+        /// The camera control interface for manipulating focus and exposure of camera that support directshow interface 
+        /// </summary>
+        private IAMCameraControl m_cameraControl;
 
 #if DEBUG
         private DsROTEntry m_rotEntry;
@@ -431,6 +437,17 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                 throw new Exception("Failed to get IAMStreamConfig");
             }
 
+            object cameraControl;
+            hr = capGraph.FindInterface(PinCategory.Capture, MediaType.Video, captureFilter,
+                typeof(IAMCameraControl).GUID, out cameraControl);
+            //not all camera support this interface, so don't throw exception
+            if (hr >= 0)
+            {
+                m_cameraControl = cameraControl as IAMCameraControl;
+                TryRetrieveExposureDatas();
+                TryRetrieveFocusDatas();
+            }
+
             /* The media type of the video */
             AMMediaType media;
 
@@ -609,5 +626,79 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                 InvokeMediaClosed(new EventArgs());
             }
         }
+
+        #region ICameraController
+
+        public int MaxExposure { get; private set; }
+        public int MinExposure { get; private set; }
+        public int DefaultExposure { get; private set; }
+        public int MaxFocus { get; private set; }
+        public int MinFocus { get; private set; }
+        public int DefaultFocus { get; private set; }
+
+        public void SetExposure(int value)
+        {
+            if (m_cameraControl != null)
+            {
+                m_cameraControl.Set(CameraControlProperty.Exposure, value, CameraControlFlags.Manual);
+            }
+        }
+
+        public void SetFocus(int value)
+        {
+            if (m_cameraControl != null)
+            {
+                m_cameraControl.Set(CameraControlProperty.Focus, value, CameraControlFlags.Manual);
+            }
+        }
+
+        public void SetToAuto()
+        {
+            if (m_cameraControl != null)
+            {
+                m_cameraControl.Set(CameraControlProperty.Exposure, 0, CameraControlFlags.Auto);
+                m_cameraControl.Set(CameraControlProperty.Focus, 0, CameraControlFlags.Auto);
+            }
+        }
+
+        private bool TryRetrieveExposureDatas()
+        {
+            bool result = false;
+            if (m_cameraControl != null)
+            {
+                int max, min,delta,def;
+                CameraControlFlags flag;
+                result = m_cameraControl.GetRange(CameraControlProperty.Exposure, out min, out max, out delta, out def,
+                    out flag) >= 0;
+
+                Debug.WriteLine(min+"::"+max+"::"+def);
+
+                MinExposure = min;
+                MaxExposure = max;
+                DefaultExposure = def;
+            }
+            return result;
+        }
+
+        private bool TryRetrieveFocusDatas()
+        {
+            bool result = false;
+            if (m_cameraControl != null)
+            {
+                int max, min, delta, def;
+                CameraControlFlags flag;
+                result = m_cameraControl.GetRange(CameraControlProperty.Focus, out min, out max, out delta, out def,
+                    out flag) >= 0;
+
+                Debug.WriteLine(min + "::" + max + "::" + def);
+
+                MinFocus = min;
+                MaxFocus = max;
+                DefaultFocus = def;
+            }
+            return result;
+        }
+
+        #endregion
     }
 }

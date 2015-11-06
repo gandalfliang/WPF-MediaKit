@@ -12,7 +12,7 @@ namespace WPFMediaKit.DirectShow.Controls
     /// displays video from a capture device, such as 
     /// a web cam.
     /// </summary>
-    public class VideoCaptureElement : MediaElementBase
+    public class VideoCaptureElement : MediaElementBase,ICameraController
     {
         public VideoCaptureElement()
         {
@@ -303,6 +303,50 @@ namespace WPFMediaKit.DirectShow.Controls
         protected override MediaPlayerBase OnRequestMediaPlayer()
         {
             return new VideoCapturePlayer();
+        }
+
+        public int MaxExposure
+        {
+            get { return VideoCapturePlayer.MaxExposure; }
+        }
+
+        public int MinExposure
+        {
+            get { return VideoCapturePlayer.MinExposure; }
+        }
+        public int DefaultExposure
+        {
+            get { return VideoCapturePlayer.DefaultExposure; }
+        }
+        public int MaxFocus
+        {
+            get { return VideoCapturePlayer.MaxFocus; }
+        }
+        public int MinFocus
+        {
+            get { return VideoCapturePlayer.MinFocus; }
+        }
+        public int DefaultFocus
+        {
+            get { return VideoCapturePlayer.DefaultFocus; }
+        }
+
+        public void SetExposure(int value)
+        {
+            if (!MediaPlayerBase.Dispatcher.Shutdown || !MediaPlayerBase.Dispatcher.ShuttingDown)
+                MediaPlayerBase.Dispatcher.BeginInvoke((Action)(() => VideoCapturePlayer.SetExposure(value)));
+        }
+
+        public void SetFocus(int value)
+        {
+            if (!MediaPlayerBase.Dispatcher.Shutdown || !MediaPlayerBase.Dispatcher.ShuttingDown)
+                MediaPlayerBase.Dispatcher.BeginInvoke((Action)(() => VideoCapturePlayer.SetFocus(value)));
+        }
+
+        public void SetToAuto()
+        {
+            if (!MediaPlayerBase.Dispatcher.Shutdown || !MediaPlayerBase.Dispatcher.ShuttingDown)
+                MediaPlayerBase.Dispatcher.BeginInvoke((Action)(() => VideoCapturePlayer.SetToAuto()));
         }
     }
 }
