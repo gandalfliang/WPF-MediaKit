@@ -618,6 +618,11 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                 Marshal.FinalReleaseComObject(m_sampleGrabber);
                 m_sampleGrabber = null;
             }
+            if (m_cameraControl != null)
+            {
+                Marshal.FinalReleaseComObject(m_cameraControl);
+                m_cameraControl = null;
+            }
             if (m_graph != null)
             {
                 Marshal.FinalReleaseComObject(m_graph);
