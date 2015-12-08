@@ -12,5 +12,6 @@
         void SetExposure(int value);
         void SetFocus(int value);
         void SetToAuto();
+        void SetToNone();
     }
 }

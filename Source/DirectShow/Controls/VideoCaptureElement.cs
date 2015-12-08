@@ -348,5 +348,11 @@ namespace WPFMediaKit.DirectShow.Controls
             if (!MediaPlayerBase.Dispatcher.Shutdown || !MediaPlayerBase.Dispatcher.ShuttingDown)
                 MediaPlayerBase.Dispatcher.BeginInvoke((Action)(() => VideoCapturePlayer.SetToAuto()));
         }
+
+        public void SetToNone()
+        {
+            if (!MediaPlayerBase.Dispatcher.Shutdown || !MediaPlayerBase.Dispatcher.ShuttingDown)
+                MediaPlayerBase.Dispatcher.BeginInvoke((Action)(() => VideoCapturePlayer.SetToNone()));
+        }
     }
 }

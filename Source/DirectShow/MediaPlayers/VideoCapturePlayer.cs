@@ -317,8 +317,11 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
                         SetVideoCaptureParameters(graphBuilder, m_captureDevice, Guid.Empty);
                 }
                 else
+                {
                     /* Configure the video output pin with our parameters */
-                    SetVideoCaptureParameters(graphBuilder, m_captureDevice, Guid.Empty);
+                    if (!SetVideoCaptureParameters(graphBuilder, m_captureDevice, MediaSubType.MJPG))
+                        SetVideoCaptureParameters(graphBuilder, m_captureDevice, Guid.Empty);
+                }
 
                 var rendererType = VideoRendererType.VideoMixingRenderer9;
 
@@ -663,6 +666,15 @@ namespace WPFMediaKit.DirectShow.MediaPlayers
             {
                 m_cameraControl.Set(CameraControlProperty.Exposure, 0, CameraControlFlags.Auto);
                 m_cameraControl.Set(CameraControlProperty.Focus, 0, CameraControlFlags.Auto);
+            }
+        }
+
+        public void SetToNone()
+        {
+            if (m_cameraControl != null)
+            {
+                m_cameraControl.Set(CameraControlProperty.Exposure, 0, CameraControlFlags.None);
+                m_cameraControl.Set(CameraControlProperty.Focus, 0, CameraControlFlags.None);
             }
         }
 
